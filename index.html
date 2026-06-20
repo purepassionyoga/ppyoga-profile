@@ -452,6 +452,22 @@ async function loadProfile(){
   NOTIFS=Object.assign({}, ...NOTIF_DEFS.map(n=>({[n[0]]:n[3]})), (PROFILE&&PROFILE.notification_prefs)||{});
   renderProfile();
 }
+async function openBillingPortal(e){
+  if(e) e.preventDefault();
+  var mb=$("manageBtn"); if(mb){ mb.textContent="Opening\u2026"; mb.style.pointerEvents="none"; }
+  try{
+    const { data:{ session } } = await sb.auth.getSession();
+    const r = await fetch(SUPABASE_URL+"/functions/v1/stripe-billing-portal",{method:"POST",
+      headers:{apikey:ANON,Authorization:"Bearer "+(session&&session.access_token),"Content-Type":"application/json"},
+      body:JSON.stringify({return_url:location.origin})});
+    const j = await r.json().catch(function(){return {};});
+    if(j && j.url){ location.href=j.url; return; }
+    $("accManage").innerHTML='<span style="font-size:12px;color:#9A929C">'+esc(j&&j.error?j.error:"Unavailable")+'</span>';
+  }catch(_){
+    $("accManage").innerHTML='<a href="#" id="manageBtn">Manage</a>';
+    var b=$("manageBtn"); if(b) b.addEventListener("click",openBillingPortal);
+  }
+}
 function renderProfile(){
   const p=PROFILE;
   $("heroAva").innerHTML=avatarHTML(p);
@@ -461,8 +477,8 @@ function renderProfile(){
   $("accEmail").textContent=p.email||EMAIL||"";
   $("accTier").innerHTML=`${tierPill(p.tier)} ${p.tier==="free"?"":""}`;
   $("accSince").textContent=p.created_at?new Date(p.created_at).toLocaleDateString(undefined,{month:"long",year:"numeric"}):"—";
-  const site=DESIGN.website_url||"https://purepassionyoga.com";
-  $("accManage").innerHTML=`<a href="${esc(site)}" target="_blank" rel="noopener">Manage</a>`;
+  $("accManage").innerHTML=(p.tier && p.tier!=="free") ? `<a href="#" id="manageBtn">Manage</a>` : "";
+  (function(){ var mb=$("manageBtn"); if(mb) mb.addEventListener("click",openBillingPortal); })();
   // notifications
   $("notifs").innerHTML=NOTIF_DEFS.map(n=>`<div class="toggle"><div><div class="tl">${esc(n[1])}</div><div class="td">${esc(n[2])}</div></div>
     <label class="sw"><input type="checkbox" data-n="${n[0]}" ${NOTIFS[n[0]]?"checked":""}/><span class="sl"></span></label></div>`).join("");
