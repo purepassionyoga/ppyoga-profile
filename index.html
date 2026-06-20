@@ -164,7 +164,7 @@
 <body>
 <header class="ppy-header" id="ppyHeader">
   <div class="ppy-bar">
-    <a class="ppy-brand" id="ppyBrand" href="https://ppyoga-app.vercel.app">
+    <a class="ppy-brand" id="ppyBrand" href="/">
       <svg class="mark" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
         <path d="M24 7c2.6 3.2 4 6.7 4 10.2 0 3.8-1.6 7.2-4 9.8-2.4-2.6-4-6-4-9.8C20 13.7 21.4 10.2 24 7Z" fill="#C8A0A6"/>
         <path d="M13 14c3.7 1 6.6 2.9 8.6 5.3 2.2 2.6 3.2 5.8 3.1 9-3.4-.6-6.6-2.2-8.8-4.8-2-2.4-3-5.6-2.9-9.5Z" fill="#a8ad91"/>
@@ -176,17 +176,17 @@
       <span class="wm brand">Pure Passion Yoga</span>
     </a>
     <nav class="ppy-nav" id="ppyNav">
-      <a href="https://ppyoga-app.vercel.app">Pose Library</a>
-      <a href="https://ppyoga-builder.vercel.app">Sequence Builder</a>
-      <a data-nav="classes" hidden href="https://ppyoga-app.vercel.app/classes">Classes</a>
-      <a data-nav="challenges" hidden href="https://ppyoga-app.vercel.app/challenges">Challenges</a>
+      <a href="/library">Pose Library</a>
+      <a href="/builder">Sequence Builder</a>
+      <a data-nav="classes" hidden href="/classes">Classes</a>
+      <a data-nav="challenges" hidden href="/challenges">Challenges</a>
       <a href="https://purepassionyoga.com/shop">Shop</a>
       <a href="https://purepassionyoga.com/about">About</a>
     </nav>
     <div class="ppy-right" id="ppyRight">
       <span class="ppy-tier" id="ppyTier" hidden></span>
-      <a class="ppy-btn admin" id="ppyAdmin" hidden href="https://ppyoga-admin.vercel.app">Admin</a>
-      <a class="ppy-btn primary" id="ppyAuth" href="https://ppyoga-profile.vercel.app">Sign in</a>
+      <a class="ppy-btn admin" id="ppyAdmin" hidden href="/admin">Admin</a>
+      <a class="ppy-btn primary" id="ppyAuth" href="/profile">Sign in</a>
       <a class="ppy-btn ghost" id="ppySignout" hidden href="#">Sign out</a>
     </div>
     <button class="ppy-burger" id="ppyBurger" aria-label="Menu">
@@ -194,14 +194,14 @@
     </button>
   </div>
   <div class="ppy-mobile" id="ppyMobile">
-    <a href="https://ppyoga-app.vercel.app">Pose Library</a>
-    <a href="https://ppyoga-builder.vercel.app">Sequence Builder</a>
-    <a data-nav="classes" hidden href="https://ppyoga-app.vercel.app/classes">Classes</a>
-    <a data-nav="challenges" hidden href="https://ppyoga-app.vercel.app/challenges">Challenges</a>
+    <a href="/library">Pose Library</a>
+    <a href="/builder">Sequence Builder</a>
+    <a data-nav="classes" hidden href="/classes">Classes</a>
+    <a data-nav="challenges" hidden href="/challenges">Challenges</a>
     <a href="https://purepassionyoga.com/shop">Shop</a>
     <a href="https://purepassionyoga.com/about">About</a>
-    <a class="admin" id="ppyAdminM" hidden href="https://ppyoga-admin.vercel.app">Admin</a>
-    <a class="up" id="ppyAuthM" href="https://ppyoga-profile.vercel.app">Sign in</a>
+    <a class="admin" id="ppyAdminM" hidden href="/admin">Admin</a>
+    <a class="up" id="ppyAuthM" href="/profile">Sign in</a>
     <a class="admin" id="ppySignoutM" hidden href="#">Sign out</a>
   </div>
 </header>
@@ -348,8 +348,8 @@
 <script>
 const SUPABASE_URL="https://nxjbpgnpblqepathojzr.supabase.co";
 const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54amJwZ25wYmxxZXBhdGhvanpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTE3MTYsImV4cCI6MjA5MDA2NzcxNn0.0thRMnySyacG_fcFiHlteEk4scwfWrP6HmjSlBdg3Ik";
-const LIBRARY_URL="https://ppyoga-app.vercel.app";
-const BUILDER_URL="https://ppyoga-builder.vercel.app";
+const LIBRARY_URL="/library";
+const BUILDER_URL="/builder";
 const sb = supabase.createClient(SUPABASE_URL, ANON);
 
 const $=id=>document.getElementById(id);
