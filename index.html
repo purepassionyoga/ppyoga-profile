@@ -390,7 +390,7 @@ async function loadDesign(){
   if(d.color_page_bg) r.setProperty("--bg",d.color_page_bg);
   if(d.color_surface) r.setProperty("--card",d.color_surface);
   if(d.color_body_text) r.setProperty("--ink",d.color_body_text);
-  if(d.color_primary){ r.setProperty("--clay",d.color_primary); r.setProperty("--clayDk",darken(d.color_primary,.14)); }
+  if(d.color_primary){ r.setProperty("--clay",d.color_primary); r.setProperty("--clayDk",d.color_primary); }
   if(d.color_secondary) r.setProperty("--sage",d.color_secondary);
   if(d.font_heading){ r.setProperty("--fontHead","'"+d.font_heading+"',Georgia,serif"); loadFont("gf-head",d.font_heading); }
   if(d.font_body){ r.setProperty("--fontBody","'"+d.font_body+"',system-ui,sans-serif"); loadFont("gf-body",d.font_body); }
@@ -692,6 +692,14 @@ $("navSignout").onclick=doSignout; $("signout2").onclick=doSignout;
     .then(function(rows){
       var map={}; (rows||[]).forEach(function(x){map[x.key]=x.value||{};});
       var d=map.design||{}, site=map.site||{};
+      (function(){ var R=document.documentElement.style, P=d.color_primary, S=d.color_secondary, f=function(k,v){ if(v) R.setProperty(k,v); };
+        if(P){ ['--ppy-accent','--ppy-accentDk','--rose','--roseDeep','--roseTitle','--clay','--clayDk','--head','--aub'].forEach(function(k){ R.setProperty(k,P); }); }
+        f('--ppy-sage',S); f('--sage',S);
+        f('--ppy-ink',d.color_body_text); f('--ink',d.color_body_text);
+        f('--ppy-bg',d.color_page_bg); f('--bg',d.color_page_bg);
+        f('--ppy-surface',d.color_surface); f('--card',d.color_surface); f('--field',d.color_surface);
+        f('--ppy-muted',d.color_secondary_text); f('--muted',d.color_secondary_text);
+      })();
       if(d.app_name){ document.querySelectorAll(".ppy-brand .wm").forEach(function(e){e.textContent=d.app_name;}); }
       if(d.logo_url){
         document.querySelectorAll(".ppy-brand").forEach(function(b){
