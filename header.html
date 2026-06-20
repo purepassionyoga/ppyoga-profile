@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Site Header · Pure Passion Yoga</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link id="gf-head" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap">
+<link id="gf-body" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<style>
+  :root{
+    --bg:#F3F3F3; --card:#fff; --ink:#5C5664; --head:#3A2E48; --clay:#C8A0A6; --clayDk:#A87C83; --sage:#a8ad91; --line:#ECE7EC;
+    --fontHead:'Playfair Display',Georgia,serif; --fontBody:'Poppins',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--fontBody);-webkit-font-smoothing:antialiased}
+
+  /* ===== SITE HEADER (reusable block) ===== */
+  .ppy-header{position:sticky;top:0;z-index:50;background:color-mix(in srgb, var(--card) 88%, transparent);backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--line);transition:box-shadow .2s}
+  .ppy-header.scrolled{box-shadow:0 6px 24px rgba(74,58,90,.07)}
+  .ppy-bar{max-width:1180px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:22px}
+  .ppy-brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex:0 0 auto}
+  .ppy-brand img.logoimg{height:46px;width:auto;display:block}
+  .ppy-brand .mark{width:38px;height:38px;flex:0 0 auto}
+  .ppy-brand .wordmark{font-family:var(--fontHead);font-weight:700;color:var(--clayDk);font-size:20px;line-height:1;letter-spacing:.01em}
+  .ppy-nav{display:flex;align-items:center;gap:6px;margin-left:8px}
+  .ppy-nav a{color:var(--head);text-decoration:none;font-size:14.5px;font-weight:500;padding:9px 13px;border-radius:10px;transition:background .15s,color .15s}
+  .ppy-nav a:hover{background:#F7F1F5;color:var(--clayDk)}
+  .ppy-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .ppy-cta{display:inline-flex;align-items:center;gap:7px;background:var(--clayDk);color:#fff;text-decoration:none;font-weight:500;font-size:14px;padding:9px 17px;border-radius:11px;transition:filter .15s}
+  .ppy-cta:hover{filter:brightness(.95)}
+  .ppy-cta.ghost{background:#fff;color:var(--aub,#4A3A5A);border:1px solid var(--line)}
+  .ppy-burger{display:none;background:none;border:1px solid var(--line);border-radius:10px;width:42px;height:40px;cursor:pointer;align-items:center;justify-content:center;color:var(--head)}
+  .ppy-burger svg{width:22px;height:22px}
+  .ppy-mobile{display:none;border-top:1px solid var(--line);background:var(--card)}
+  .ppy-mobile a{display:block;padding:14px 22px;color:var(--head);text-decoration:none;font-weight:500;border-bottom:1px solid var(--line)}
+  .ppy-mobile a:last-child{border-bottom:none}
+  .ppy-mobile a.cta{color:var(--clayDk)}
+  @media (max-width:860px){
+    .ppy-nav{display:none}
+    .ppy-right .ppy-cta.desktoponly{display:none}
+    .ppy-burger{display:inline-flex}
+    .ppy-mobile.open{display:block}
+  }
+  /* ===== END HEADER ===== */
+
+  /* demo page body (not part of the header) */
+  .demo{max-width:1180px;margin:0 auto;padding:60px 22px}
+  .demo .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--clayDk);font-weight:600}
+  .demo h1{font-family:var(--fontHead);color:var(--head);font-size:44px;margin:10px 0 12px;font-weight:700;max-width:14ch}
+  .demo p{font-size:17px;max-width:54ch;line-height:1.7}
+  .demo .row{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+  .demo .b1{background:var(--clayDk);color:#fff;text-decoration:none;padding:12px 22px;border-radius:12px;font-weight:500}
+  .demo .b2{background:#fff;color:var(--head);text-decoration:none;padding:12px 22px;border-radius:12px;font-weight:500;border:1px solid var(--line)}
+  .demo .accent{height:4px;width:60px;background:linear-gradient(90deg,var(--clay),var(--sage));border-radius:999px;margin:30px 0 0}
+  .demo .label{margin-top:50px;color:#9A95A0;font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- ===== SITE HEADER markup ===== -->
+<header class="ppy-header" id="ppyHeader">
+  <div class="ppy-bar">
+    <a class="ppy-brand" id="ppyBrand" href="#"></a>
+    <nav class="ppy-nav" id="ppyNav"></nav>
+    <div class="ppy-right">
+      <a class="ppy-cta desktoponly" id="ppyAuth" href="#">Sign in</a>
+      <button class="ppy-burger" id="ppyBurger" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="ppy-mobile" id="ppyMobile"></div>
+</header>
+<!-- ===== END SITE HEADER ===== -->
+
+<!-- demo content so you can see the header in context -->
+<div class="demo">
+  <span class="eyebrow">Preview</span>
+  <h1>Your practice, beautifully in one place.</h1>
+  <p>This is just placeholder page content so you can see how the header sits above a real page. The header itself is the part we’re designing — scroll to watch it lift, and resize the window to see the mobile menu.</p>
+  <div class="row"><a class="b1" href="#">Explore poses</a><a class="b2" href="#">Build a sequence</a></div>
+  <div class="accent"></div>
+  <p class="label">Header reads your live brand settings (colors, fonts, app name, and logo) and shows “My Account” instead of “Sign in” once a member is logged in.</p>
+</div>
+
+<script>
+/* ====== CONFIG (edit these once you're on your real domain) ====== */
+const SUPABASE_URL="https://nxjbpgnpblqepathojzr.supabase.co";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54amJwZ25wYmxxZXBhdGhvanpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTE3MTYsImV4cCI6MjA5MDA2NzcxNn0.0thRMnySyacG_fcFiHlteEk4scwfWrP6HmjSlBdg3Ik";
+// Destinations — overridable from Admin → Design later (url_shop, url_about, url_account)
+const NAV_DEFAULT = {
+  library: "https://ppyoga-app.vercel.app",
+  builder: "https://ppyoga-builder.vercel.app",
+  shop:    "https://purepassionyoga.com/shop",
+  about:   "https://purepassionyoga.com/about",
+  account: "https://ppyoga-profile.vercel.app"   // your member profile app (update when deployed)
+};
+/* ================================================================= */
+
+const sb = supabase.createClient(SUPABASE_URL, ANON);
+const $=id=>document.getElementById(id);
+const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const LOTUS = `<svg class="mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M24 7c2.6 3.2 4 6.7 4 10.2 0 3.8-1.6 7.2-4 9.8-2.4-2.6-4-6-4-9.8C20 13.7 21.4 10.2 24 7Z" fill="var(--clay)"/>
+  <path d="M13 14c3.7 1 6.6 2.9 8.6 5.3 2.2 2.6 3.2 5.8 3.1 9-3.4-.6-6.6-2.2-8.8-4.8-2-2.4-3-5.6-2.9-9.5Z" fill="var(--sage)" opacity=".9"/>
+  <path d="M35 14c-3.7 1-6.6 2.9-8.6 5.3-2.2 2.6-3.2 5.8-3.1 9 3.4-.6 6.6-2.2 8.8-4.8 2-2.4 3-5.6 2.9-9.5Z" fill="var(--sage)" opacity=".9"/>
+  <path d="M8 22c3.6-.2 6.8.6 9.4 2.3 2.7 1.8 4.5 4.4 5.4 7.4-3.4.5-6.8-.1-9.6-1.9C10.7 28.2 9 25.4 8 22Z" fill="var(--clayDk)" opacity=".85"/>
+  <path d="M40 22c-3.6-.2-6.8.6-9.4 2.3-2.7 1.8-4.5 4.4-5.4 7.4 3.4.5 6.8-.1 9.6-1.9 2.5-1.6 4.2-4.4 5.2-7.8Z" fill="var(--clayDk)" opacity=".85"/>
+  <path d="M12 31c4 0 12 1.6 12 8 0-6.4 8-8 12-8-1.5 5-6.5 9-12 9s-10.5-4-12-9Z" fill="var(--clay)"/>
+</svg>`;
+
+function applyDesign(d){
+  const r=document.documentElement.style;
+  if(d.color_page_bg) r.setProperty("--bg",d.color_page_bg);
+  if(d.color_surface) r.setProperty("--card",d.color_surface);
+  if(d.color_body_text) r.setProperty("--ink",d.color_body_text);
+  if(d.color_primary){ r.setProperty("--clay",d.color_primary); r.setProperty("--clayDk",d.color_primary); }
+  if(d.color_secondary) r.setProperty("--sage",d.color_secondary);
+  if(d.font_heading){ r.setProperty("--fontHead","'"+d.font_heading+"',Georgia,serif"); $("gf-head").href="https://fonts.googleapis.com/css2?family="+encodeURIComponent(d.font_heading)+":wght@500;600;700&display=swap"; }
+  if(d.font_body){ r.setProperty("--fontBody","'"+d.font_body+"',system-ui,sans-serif"); $("gf-body").href="https://fonts.googleapis.com/css2?family="+encodeURIComponent(d.font_body)+":wght@400;500;600&display=swap"; }
+}
+
+function buildHeader(d, session){
+  const name=d.app_name||"Pure Passion Yoga";
+  const nav={ ...NAV_DEFAULT };
+  if(d.url_shop) nav.shop=d.url_shop;
+  if(d.url_about) nav.about=d.url_about;
+  if(d.url_account) nav.account=d.url_account;
+
+  // brand: logo image if set, else lotus mark + wordmark
+  $("ppyBrand").href=nav.library;
+  $("ppyBrand").innerHTML = d.logo_url
+    ? `<img class="logoimg" src="${esc(d.logo_url)}" alt="${esc(name)}">`
+    : `${LOTUS}<span class="wordmark">${esc(name)}</span>`;
+
+  const links=[
+    ["Pose Library", nav.library],
+    ["Sequence Builder", nav.builder],
+    ["Shop", nav.shop],
+    ["About", nav.about],
+  ];
+  $("ppyNav").innerHTML=links.map(l=>`<a href="${esc(l[1])}">${esc(l[0])}</a>`).join("");
+
+  const loggedIn=!!session;
+  const authLabel=loggedIn?"My Account":"Sign in";
+  $("ppyAuth").textContent=authLabel; $("ppyAuth").href=nav.account;
+
+  $("ppyMobile").innerHTML=links.map(l=>`<a href="${esc(l[1])}">${esc(l[0])}</a>`).join("")
+    + `<a class="cta" href="${esc(nav.account)}">${authLabel}</a>`;
+}
+
+$("ppyBurger").onclick=()=>$("ppyMobile").classList.toggle("open");
+addEventListener("scroll",()=>{ $("ppyHeader").classList.toggle("scrolled", scrollY>4); });
+
+(async function(){
+  let d={};
+  try{ const { data } = await sb.from("app_settings").select("value").eq("key","design").single(); d=(data&&data.value)||{}; }catch(e){}
+  applyDesign(d);
+  let session=null;
+  try{ const { data } = await sb.auth.getSession(); session=data.session; }catch(e){}
+  buildHeader(d, session);
+})();
+</script>
+</body>
+</html>
