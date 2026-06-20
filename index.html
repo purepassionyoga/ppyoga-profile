@@ -96,7 +96,8 @@
 
   .favgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
   .fav{border:1px solid var(--line);border-radius:13px;padding:12px;text-align:center;position:relative}
-  .fav .em{font-size:26px}
+  .fav .em{height:64px;display:flex;align-items:center;justify-content:center;font-size:34px}
+  .fav .em img{max-height:64px;max-width:100%;object-fit:contain}
   .fav .nm{font-weight:500;color:var(--head);font-size:13px;margin-top:5px;line-height:1.25}
   .fav .sn{color:var(--muted);font-size:11px;font-style:italic}
   .fav .x{position:absolute;top:5px;right:5px}
@@ -578,7 +579,7 @@ async function loadFavorites(){
   $("favorites").innerHTML=`<div class="favgrid">`+rows.map(r=>{
     const po=r.poses;
     return `<div class="fav"><button class="xbtn x" data-unfav="${esc(r.pose_id)}" title="Remove">♡</button>
-      <div class="em">${esc(po.emoji||"🧘")}</div>
+      <div class="em">${po.image_url?`<img src="${esc(po.image_url)}" alt="${esc(po.name||"")}">`:esc(po.emoji||"🧘")}</div>
       <div class="nm">${esc(po.name||"")}</div>
       ${po.sanskrit_name?`<div class="sn">${esc(po.sanskrit_name)}</div>`:""}</div>`;
   }).join("")+`</div>`;
