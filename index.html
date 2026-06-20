@@ -242,6 +242,10 @@
     </div>
     <div class="field"><label>Email</label><input id="aEmail" type="email" autocomplete="username" /></div>
     <div class="field"><label>Password</label><input id="aPass" type="password" autocomplete="current-password" /></div>
+    <label id="newsRow" class="hidden" style="display:flex;align-items:flex-start;gap:9px;margin:2px 0 12px;font-size:12.5px;color:var(--muted);cursor:pointer">
+      <input type="checkbox" id="aNews" style="margin-top:2px;flex:0 0 auto"/>
+      <span>Email me sequences &amp; studio news. You can change this anytime. <em>(optional)</em></span>
+    </label>
     <button id="aGo" class="btn" style="width:100%">Sign in</button>
     <div class="divider">or</div>
     <button id="aMagic" class="btn ghost" style="width:100%">Email me a sign-in link</button>
@@ -335,6 +339,7 @@
       <div class="card">
         <div class="ch">Notifications</div>
         <div class="cb">
+          <div id="newsSub"></div>
           <div id="notifs"></div>
           <div style="margin-top:12px;display:flex;align-items:center;gap:10px">
             <button id="saveNotifs" class="btn sm">Save preferences</button>
@@ -373,7 +378,6 @@ const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;
 const TIER_C={free:"#8A8090",practitioner:"#A87C83",teacher:"#2E7D6B",ultimate:"#B98A1F",premium:"#7A6B8A",member:"#9A8FA8"};
 const EMOJIS=["🧘‍♀️","🧘","🌸","🪷","☀️","🌙","🌿","🕊️","💗","✨","🦋","🌺","🍃","🧡","🌅","💫"];
 const NOTIF_DEFS=[
-  ["weekly_email","Weekly sequence email","The Sequence of the Week in your inbox",true],
   ["practice_reminders","Practice reminders","Gentle nudges to keep your streak going",false],
   ["achievement_alerts","Badge alerts","Know when you earn a new badge",true],
   ["community_updates","Community updates","New community challenges and shared sequences",true],
@@ -403,7 +407,8 @@ async function loadDesign(){
 let authMode="in";
 function setMode(m){ authMode=m; $("segIn").classList.toggle("on",m==="in"); $("segUp").classList.toggle("on",m==="up");
   $("aGo").textContent=m==="in"?"Sign in":"Create account"; $("authSub").textContent=m==="in"?"Sign in to your practice":"Create your account";
-  $("aPass").setAttribute("autocomplete",m==="in"?"current-password":"new-password"); }
+  $("aPass").setAttribute("autocomplete",m==="in"?"current-password":"new-password");
+  var nr=$("newsRow"); if(nr){ nr.classList.toggle("hidden", m!=="up"); if(m!=="up"){ var an=$("aNews"); if(an) an.checked=false; } } }
 $("segIn").onclick=()=>setMode("in"); $("segUp").onclick=()=>setMode("up");
 function authMsg(html,cls){ $("authMsg").innerHTML=html?`<div class="${cls||'err'}">${html}</div>`:""; }
 $("aGo").onclick=async()=>{
@@ -413,7 +418,7 @@ $("aGo").onclick=async()=>{
   $("aGo").disabled=true; const orig=$("aGo").textContent; $("aGo").textContent="…";
   let res;
   if(authMode==="in") res=await sb.auth.signInWithPassword({ email, password });
-  else res=await sb.auth.signUp({ email, password, options:{ emailRedirectTo: location.href.split("#")[0] } });
+  else res=await sb.auth.signUp({ email, password, options:{ emailRedirectTo: location.href.split("#")[0], data:{ newsletter_optin: !!($("aNews")&&$("aNews").checked) } } });
   $("aGo").disabled=false; $("aGo").textContent=orig;
   if(res.error){ authMsg(esc(res.error.message)); return; }
   if(authMode==="up" && !res.data.session){ authMsg("Check your email to confirm your account, then come back and sign in.","ok"); return; }
@@ -452,6 +457,8 @@ async function boot(session){
   $("auth").classList.add("hidden"); $("app").classList.remove("hidden");
   buildStaticBits();
   await loadProfile();
+  await syncSignupOptIn(session);
+  renderNewsSub();
   loadFavorites(); loadPractice(); loadBadges(); loadSequences();
 }
 function buildStaticBits(){
@@ -636,9 +643,63 @@ $("saveProfile").onclick=async()=>{
   renderProfile(); setTimeout(()=>{ $("editCard").classList.add("hidden"); $("saveMsg").innerHTML=""; },800);
 };
 
+/* ---------- newsletter (unified mailing list) ---------- */
+async function callNewsletter(action){
+  const { data:{ session } } = await sb.auth.getSession();
+  const r = await fetch(SUPABASE_URL+"/functions/v1/manage-newsletter",{method:"POST",
+    headers:{apikey:ANON,Authorization:"Bearer "+(session&&session.access_token),"Content-Type":"application/json"},
+    body:JSON.stringify({action})});
+  return r.json().catch(()=>({}));
+}
+async function syncSignupOptIn(session){
+  try{
+    var wants = session && session.user && session.user.user_metadata && session.user.user_metadata.newsletter_optin===true;
+    var prefs = (PROFILE && PROFILE.notification_prefs) || {};
+    var already = Object.prototype.hasOwnProperty.call(prefs,"newsletter");
+    if(!wants || already) return;
+    var r = await callNewsletter("subscribe");
+    if(r && r.ok){
+      var np=Object.assign({}, prefs, {newsletter:true});
+      await sb.from("profiles").update({notification_prefs:np}).eq("id",UID);
+      if(PROFILE) PROFILE.notification_prefs=np; NOTIFS.newsletter=true;
+    }
+  }catch(e){}
+}
+async function renderNewsSub(){
+  var box=$("newsSub"); if(!box) return;
+  box.innerHTML='<div class="toggle"><div><div class="tl">Weekly sequence email</div><div class="td">Checking your subscription\u2026</div></div></div>';
+  var res=await callNewsletter("status");
+  drawNewsSub(!!(res&&res.subscribed));
+}
+function drawNewsSub(subbed){
+  var box=$("newsSub"); if(!box) return;
+  box.innerHTML='<div class="toggle"><div><div class="tl">Weekly sequence email</div>'
+    +'<div class="td">'+(subbed?"You\u2019re subscribed to the mailing list":"You\u2019re not on the mailing list \u2014 flip this on to receive it")+'</div></div>'
+    +'<label class="sw"><input type="checkbox" id="newsToggle" '+(subbed?"checked":"")+'/><span class="sl"></span></label></div>'
+    +'<div id="newsSubMsg" class="inlinemsg" style="display:block;margin:-4px 0 8px"></div>';
+  $("newsToggle").onchange=async function(){
+    var want=this.checked, self=this; self.disabled=true;
+    $("newsSubMsg").innerHTML='<span style="color:var(--muted)">Saving\u2026</span>';
+    var r=await callNewsletter(want?"subscribe":"unsubscribe");
+    self.disabled=false;
+    if(r && r.ok){
+      var td=$("newsSub").querySelector(".td");
+      if(td) td.textContent = want?"You\u2019re subscribed to the mailing list":"You\u2019re not on the mailing list \u2014 flip this on to receive it";
+      $("newsSubMsg").innerHTML='<span style="color:var(--jade)">'+(want?"Subscribed \u2713":"Unsubscribed \u2713")+'</span>';
+      try{ var prefs=Object.assign({}, (PROFILE&&PROFILE.notification_prefs)||{}, {newsletter:want});
+        await sb.from("profiles").update({notification_prefs:prefs}).eq("id",UID);
+        if(PROFILE) PROFILE.notification_prefs=prefs; NOTIFS.newsletter=want; }catch(e){}
+      setTimeout(function(){ var m=$("newsSubMsg"); if(m) m.innerHTML=""; },2200);
+    } else {
+      self.checked=!want;
+      $("newsSubMsg").innerHTML='<span style="color:#A03A22">'+esc((r&&r.error)||"Couldn\u2019t update \u2014 try again")+'</span>';
+    }
+  };
+}
+
 /* ---------- notifications ---------- */
 $("saveNotifs").onclick=async()=>{
-  const prefs={}; $("notifs").querySelectorAll("[data-n]").forEach(c=>prefs[c.dataset.n]=c.checked);
+  const prefs=Object.assign({}, (PROFILE&&PROFILE.notification_prefs)||{}); $("notifs").querySelectorAll("[data-n]").forEach(c=>prefs[c.dataset.n]=c.checked);
   $("saveNotifs").disabled=true; $("notifMsg").innerHTML='<span style="color:var(--muted)">Saving…</span>';
   const { error } = await sb.from("profiles").update({ notification_prefs:prefs }).eq("id",UID);
   $("saveNotifs").disabled=false;
