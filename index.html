@@ -180,7 +180,7 @@
       <a href="/builder">Sequence Builder</a>
       <a data-nav="classes" hidden href="/classes">Classes</a>
       <a data-nav="challenges" hidden href="/challenges">Challenges</a>
-      <a href="https://purepassionyoga.com/shop">Shop</a>
+      <a data-nav="shop" hidden href="/shop">Shop</a>
       <a href="https://purepassionyoga.com/about">About</a>
     </nav>
     <div class="ppy-right" id="ppyRight">
@@ -198,7 +198,7 @@
     <a href="/builder">Sequence Builder</a>
     <a data-nav="classes" hidden href="/classes">Classes</a>
     <a data-nav="challenges" hidden href="/challenges">Challenges</a>
-    <a href="https://purepassionyoga.com/shop">Shop</a>
+    <a data-nav="shop" hidden href="/shop">Shop</a>
     <a href="https://purepassionyoga.com/about">About</a>
     <a class="admin" id="ppyAdminM" hidden href="/admin">Admin</a>
     <a class="up" id="ppyAuthM" href="/profile">Sign in</a>
@@ -671,6 +671,7 @@ $("navSignout").onclick=doSignout; $("signout2").onclick=doSignout;
       }
       if(site.classes_enabled)    document.querySelectorAll("[data-nav='classes']").forEach(function(e){e.hidden=false;});
       if(site.challenges_enabled) document.querySelectorAll("[data-nav='challenges']").forEach(function(e){e.hidden=false;});
+      fetch(SB+"/rest/v1/app_settings?select=value&key=eq.shop",{headers:{apikey:KEY,Authorization:"Bearer "+KEY}}).then(function(r){return r.ok?r.json():[];}).then(function(rows){if(rows&&rows[0]&&rows[0].value&&rows[0].value.enabled){document.querySelectorAll("[data-nav='shop']").forEach(function(e){e.hidden=false;});}}).catch(function(){});
     }).catch(function(){});
 
   function readSession(){
