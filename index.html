@@ -162,6 +162,21 @@
 </style>
 </head>
 <body>
+<style id="ppyLoaderCSS">
+#ppyLoader{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#FBF7F6;opacity:1;transition:opacity .45s ease}
+#ppyLoader.hide{opacity:0;pointer-events:none}
+#ppyLoader .ppyl-mark{font-size:52px;line-height:1;animation:ppySpin 1s linear infinite;transform-origin:50% 50%}
+#ppyLoader .ppyl-word{font-family:'Playfair Display',Georgia,serif;color:#A87C83;font-size:14px;letter-spacing:.06em;opacity:.75}
+@keyframes ppySpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#ppyLoader .ppyl-mark{animation:none}}
+</style>
+<div id="ppyLoader" aria-hidden="true">
+  <div class="ppyl-mark">🌸</div>
+  <div class="ppyl-word">Pure Passion Yoga</div>
+</div>
+<script>
+(function(){var el=document.getElementById('ppyLoader');if(!el)return;var done=false;function hide(){if(done)return;done=true;el.classList.add('hide');setTimeout(function(){if(el)el.style.display='none';},520);}window.ppyHideLoader=hide;if(document.readyState==='complete'){setTimeout(hide,180);}else{window.addEventListener('load',function(){setTimeout(hide,180);});}setTimeout(hide,6000);})();
+</script>
 <header class="ppy-header" id="ppyHeader">
   <div class="ppy-bar">
     <a class="ppy-brand" id="ppyBrand" href="/">
