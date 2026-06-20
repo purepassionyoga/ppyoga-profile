@@ -130,6 +130,7 @@
 
   /* ===== PPY site header ===== */
 .ppy-header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--ppy-line,#EFE6E8)}
+.ppy-header [hidden]{display:none !important}
 .ppy-bar{max-width:1200px;margin:0 auto;padding:11px 22px;display:flex;align-items:center;gap:16px}
 .ppy-brand{display:flex;align-items:center;gap:9px;text-decoration:none;flex:0 0 auto}
 .ppy-brand .mark{width:34px;height:34px;flex:0 0 auto}
@@ -186,6 +187,7 @@
       <span class="ppy-tier" id="ppyTier" hidden></span>
       <a class="ppy-btn admin" id="ppyAdmin" hidden href="https://ppyoga-admin.vercel.app">Admin</a>
       <a class="ppy-btn primary" id="ppyAuth" href="https://ppyoga-profile.vercel.app">Sign in</a>
+      <a class="ppy-btn ghost" id="ppySignout" hidden href="#">Sign out</a>
     </div>
     <button class="ppy-burger" id="ppyBurger" aria-label="Menu">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -200,6 +202,7 @@
     <a href="https://purepassionyoga.com/about">About</a>
     <a class="admin" id="ppyAdminM" hidden href="https://ppyoga-admin.vercel.app">Admin</a>
     <a class="up" id="ppyAuthM" href="https://ppyoga-profile.vercel.app">Sign in</a>
+    <a class="admin" id="ppySignoutM" hidden href="#">Sign out</a>
   </div>
 </header>
 
@@ -213,7 +216,7 @@
       <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
       Continue with Google
     </button>
-    <button id="oauthFacebook" class="btn oauth">
+    <button id="oauthFacebook" class="btn oauth" hidden>
       <svg viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
       Continue with Facebook
     </button>
@@ -233,7 +236,7 @@
 
 <!-- APP -->
 <div id="app" class="hidden">
-  <div class="top">
+  <div class="top" style="display:none">
     <div class="topin">
       <span class="brand" id="navBrand">Pure Passion Yoga</span>
       <div class="topnav">
@@ -630,21 +633,19 @@ $("navSignout").onclick=doSignout; $("signout2").onclick=doSignout;
   sb.auth.onAuthStateChange((_e,s)=>{ if(s && $("app").classList.contains("hidden")) boot(s); });
 })();
 </script>
+
 <script>
 /* ===== PPY adaptive header controller =====
-   Self-contained. No external deps. Safe on any PPY page.
-   Today (cross-origin): no same-origin session -> renders the logged-out shell.
-   Once pages share one domain: auto-upgrades to tier/admin-aware with zero re-bake.
-*/
+   Self-contained, no external deps. Cross-origin safe.
+   Logged-out / cross-origin -> shows the public shell.
+   Same-origin session -> tier pill, Account, Admin (if is_admin), Sign out. */
 (function(){
-  var SB="https://nxjbpgnpblqepathojzr.supabase.co", KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54amJwZ25wYmxxZXBhdGhvanpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTE3MTYsImV4cCI6MjA5MDA2NzcxNn0.0thRMnySyacG_fcFiHlteEk4scwfWrP6HmjSlBdg3Ik";
+  var SB="https://nxjbpgnpblqepathojzr.supabase.co", KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54amJwZ25wYmxxZXBhdGhvanpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTE3MTYsImV4cCI6MjA5MDA2NzcxNn0.0thRMnySyacG_fcFiHlteEk4scwfWrP6HmjSlBdg3Ik", REF="nxjbpgnpblqepathojzr";
   var $=function(id){return document.getElementById(id);};
 
-  // 1) Burger -> mobile menu
   var burger=$("ppyBurger"), mob=$("ppyMobile");
   if(burger&&mob) burger.addEventListener("click",function(){mob.classList.toggle("open");});
 
-  // 2) Active link by current location
   try{
     var norm=function(h,p){return h+(p||"/").replace(/\/index\.html$/,"/").replace(/\/+$/,"/");};
     var here=norm(location.host, location.pathname);
@@ -653,7 +654,6 @@ $("navSignout").onclick=doSignout; $("signout2").onclick=doSignout;
     });
   }catch(e){}
 
-  // 3) design + site config (one request): brand text, logo, Classes/Challenges reveal
   fetch(SB+"/rest/v1/app_settings?select=key,value&key=in.(design,site)",
         {headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
     .then(function(r){return r.ok?r.json():[];})
@@ -673,11 +673,9 @@ $("navSignout").onclick=doSignout; $("signout2").onclick=doSignout;
       if(site.challenges_enabled) document.querySelectorAll("[data-nav='challenges']").forEach(function(e){e.hidden=false;});
     }).catch(function(){});
 
-  // 4) Auth state from same-origin Supabase session (no SDK needed).
-  //    Cross-origin there is no token here, so this is a graceful no-op until same domain.
   function readSession(){
     try{
-      var raw=localStorage.getItem("sb-nxjbpgnpblqepathojzr-auth-token");
+      var raw=localStorage.getItem("sb-"+REF+"-auth-token");
       if(!raw) return null;
       if(raw.indexOf("base64-")===0){ raw=decodeURIComponent(escape(atob(raw.slice(7)))); }
       var s=JSON.parse(raw);
@@ -686,22 +684,40 @@ $("navSignout").onclick=doSignout; $("signout2").onclick=doSignout;
     return null;
   }
   var sess=readSession();
-  if(!sess) return; // logged-out shell stands
+  if(!sess) return;
 
-  // Logged in: flip to Account, fetch tier + admin
-  var auth=$("ppyAuth"), authM=$("ppyAuthM");
+  function signOut(e){
+    if(e) e.preventDefault();
+    try{ Object.keys(localStorage).forEach(function(k){ if(k.indexOf("sb-"+REF+"-auth-token")===0) localStorage.removeItem(k); }); }catch(_){}
+    location.reload();
+  }
+  var auth=$("ppyAuth"), authM=$("ppyAuthM"), so=$("ppySignout"), som=$("ppySignoutM");
   if(auth) auth.textContent="Account";
   if(authM) authM.textContent="Account";
+  if(so){ so.hidden=false; so.addEventListener("click",signOut); }
+  if(som){ som.hidden=false; som.addEventListener("click",signOut); }
+
   fetch(SB+"/rest/v1/profiles?select=tier,is_admin&id=eq."+encodeURIComponent(sess.user.id),
         {headers:{apikey:KEY,Authorization:"Bearer "+sess.access_token}})
     .then(function(r){return r.ok?r.json():[];})
     .then(function(rows){
       var p=(rows&&rows[0])||{};
       if(p.tier){ var t=$("ppyTier"); if(t){ t.textContent=p.tier; t.hidden=false; } }
-      if(p.is_admin){
-        var a=$("ppyAdmin"); if(a) a.hidden=false;
-        var am=$("ppyAdminM"); if(am) am.hidden=false;
-      }
+      if(p.is_admin){ var a=$("ppyAdmin"); if(a) a.hidden=false; var am=$("ppyAdminM"); if(am) am.hidden=false; }
+    }).catch(function(){});
+})();
+</script>
+
+<script>
+/* OAuth provider visibility — Facebook hidden until site.auth_facebook is on */
+(function(){
+  var SB="https://nxjbpgnpblqepathojzr.supabase.co", KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54amJwZ25wYmxxZXBhdGhvanpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTE3MTYsImV4cCI6MjA5MDA2NzcxNn0.0thRMnySyacG_fcFiHlteEk4scwfWrP6HmjSlBdg3Ik";
+  fetch(SB+"/rest/v1/app_settings?select=value&key=eq.site",{headers:{apikey:KEY,Authorization:"Bearer "+KEY}})
+    .then(function(r){return r.ok?r.json():[];}).then(function(rows){
+      var s=(rows&&rows[0]&&rows[0].value)||{};
+      var fb=document.getElementById("oauthFacebook"), gg=document.getElementById("oauthGoogle");
+      if(fb && s.auth_facebook===true) fb.hidden=false;
+      if(gg && s.auth_google===false)  gg.hidden=true;
     }).catch(function(){});
 })();
 </script>
